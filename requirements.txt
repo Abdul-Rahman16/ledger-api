@@ -11,6 +11,7 @@ click==8.5.0
 colorama==0.4.6
 cryptography==50.0.2
 distro==1.9.0
+et_xmlfile==2.0.0
 fastapi==0.161.1
 google-auth==2.62.0
 google-genai==2.33.0
@@ -25,10 +26,13 @@ jmespath==1.1.0
 Mako==1.4.3
 MarkupSafe==3.0.4
 numpy==2.5.4
+openpyxl==3.1.5
 opentelemetry-api==1.45.1
 packaging==26.3
 pandas==3.1.0
 pluggy==1.7.0
+psycopg==3.3.6
+psycopg-binary==3.3.6
 psycopg2-binary==2.9.13
 pyasn1==0.6.4
 pyasn1_modules==0.4.2
@@ -41,6 +45,7 @@ pytest==9.1.1
 pytest-asyncio==1.4.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.4
+python-multipart==0.0.32
 PyYAML==6.0.3
 requests==2.34.2
 s3transfer==0.19.3
