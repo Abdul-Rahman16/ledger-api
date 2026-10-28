@@ -13,6 +13,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -67,8 +68,8 @@ class MetricDefinition(Base):
     dataset_id = Column(UUID(as_uuid=True), ForeignKey("datasets.id"), nullable=False)
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
-    sql_expression = Column(Text, nullable=False)  # e.g. SUM(order_total)
-    filter_sql = Column(Text, nullable=True)  # e.g. status = 'completed'
+    sql_expression = Column(Text, nullable=False)  # canonical, validated, e.g. SUM("order_total")
+    filter_sql = Column(Text, nullable=True)  # canonical, validated, e.g. "status" = 'completed'
     version = Column(Integer, nullable=False, default=1)
     is_active = Column(Boolean, nullable=False, default=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
@@ -76,6 +77,13 @@ class MetricDefinition(Base):
     __table_args__ = (
         UniqueConstraint("dataset_id", "name", "version", name="uq_metric_version"),
         Index("ix_metric_lookup", "dataset_id", "name", "is_active"),
+        Index(
+            "uq_metric_one_active",
+            "dataset_id",
+            "name",
+            unique=True,
+            postgresql_where=text("is_active"),
+        ),
     )
 
 

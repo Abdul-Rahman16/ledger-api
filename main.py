@@ -1,0 +1,15 @@
+from fastapi import FastAPI
+
+from api.datasets import router as datasets_router
+from api.metrics import router as metrics_router
+
+app = FastAPI(title="Ledger API", version="0.1.0")
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+app.include_router(datasets_router)
+app.include_router(metrics_router)

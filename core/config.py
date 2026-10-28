@@ -9,5 +9,13 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     environment: str = "development"
 
+    # Shared secret between the Next.js server and this API.
+    # Empty means "no authenticated users accepted" (fail closed).
+    internal_secret: str = ""
+
+    upload_rate_limit_per_minute: int = 10
+    read_rate_limit_per_minute: int = 60
+    metric_write_rate_limit_per_minute: int = 30
+
 
 settings = Settings()

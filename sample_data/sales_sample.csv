@@ -1,0 +1,7 @@
+order_id,region,amount,order_date,status
+1,North,120.50,2026-01-05,completed
+2,South,89.99,2026-01-06,completed
+3,North,45.00,2026-01-07,refunded
+4,East,230.25,2026-01-08,completed
+5,South,60.00,2026-01-09,completed
+6,West,15.75,2026-01-10,refunded
