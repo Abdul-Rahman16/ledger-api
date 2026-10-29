@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     upload_rate_limit_per_minute: int = 10
     read_rate_limit_per_minute: int = 60
     metric_write_rate_limit_per_minute: int = 30
+    query_rate_limit_per_minute: int = 20
 
 
 settings = Settings()

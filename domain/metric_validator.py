@@ -364,6 +364,8 @@ class _Parser:
         value = token.value[1:-1].replace("''", "'")
         if len(value) > 200:
             raise MetricValidationError("String value is too long.")
+        if "\\" in value:
+            raise MetricValidationError("Backslashes are not allowed in values.")
         if dtype == "datetime":
             try:
                 datetime.fromisoformat(value)

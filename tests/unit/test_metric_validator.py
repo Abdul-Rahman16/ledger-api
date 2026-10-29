@@ -133,6 +133,7 @@ def test_filter_injection_attempts_are_rejected():
         "amount LIKE '1%'",
         "region BETWEEN 'a' AND 'b'",
         "amount IN ()",
+        "status = 'a\\b'",
     ]
     for attack in attacks:
         rejected("COUNT(*)", attack)
