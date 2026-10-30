@@ -52,7 +52,7 @@ def _active_metric(db: Session, dataset_id: uuid.UUID, name: str):
         raise QueryRejected(f"Unknown metric '{name[:60]}'.{hint}") from None
 
 
-def _log_attempt(
+def log_attempt(
     db: Session,
     dataset_id: uuid.UUID,
     user_id: str | None,
@@ -62,6 +62,7 @@ def _log_attempt(
     status: str,
     reason: str | None = None,
     row_count: int | None = None,
+    tokens_used: int = 0,
 ) -> uuid.UUID | None:
     """Audit row for every attempt. Never allowed to break the request."""
     try:
@@ -72,9 +73,9 @@ def _log_attempt(
             matched_metric_id=metric.id if metric is not None else None,
             generated_sql=built.sql if built is not None else None,
             status=status,
-            rejection_reason=reason,
+            rejection_reason=reason[:1000] if reason else None,
             row_count=row_count,
-            tokens_used=0,
+            tokens_used=tokens_used,
         )
         db.add(entry)
         db.commit()
@@ -91,6 +92,7 @@ def run_query(
     user_id: str | None,
     spec: QuerySpec,
     question: str | None = None,
+    tokens_used: int = 0,
 ) -> QueryOutcome:
     dataset_id = dataset.id
     table_name = dataset.table_name
@@ -108,15 +110,18 @@ def run_query(
         column_names, rows = execute_readonly(built.sql, built.limit + 1)
         result = validate_result(column_names, rows, built)
     except QueryRejected as exc:
-        _log_attempt(db, dataset_id, user_id, question_text, metric, built, "rejected", reason=str(exc))
+        log_attempt(db, dataset_id, user_id, question_text, metric, built, "rejected",
+                    reason=str(exc), tokens_used=tokens_used)
         raise
     except (QueryExecutionError, ResultInvalid) as exc:
-        _log_attempt(db, dataset_id, user_id, question_text, metric, built, "failed", reason=str(exc))
+        log_attempt(db, dataset_id, user_id, question_text, metric, built, "failed",
+                    reason=str(exc), tokens_used=tokens_used)
         raise
 
     display_sql = built.sql.replace(quote_ident(built.table_name), '"dataset"')
-    query_id = _log_attempt(
-        db, dataset_id, user_id, question_text, metric, built, "answered", row_count=result.row_count
+    query_id = log_attempt(
+        db, dataset_id, user_id, question_text, metric, built, "answered",
+        row_count=result.row_count, tokens_used=tokens_used,
     )
     return QueryOutcome(
         query_id=query_id,
@@ -128,3 +133,16 @@ def run_query(
         truncated=result.truncated,
         warnings=result.warnings,
     )
+
+def add_tokens(db: Session, query_id: uuid.UUID | None, tokens: int) -> None:
+    """Add LLM tokens used after the audit row was written (best effort)."""
+    if query_id is None or tokens <= 0:
+        return
+    try:
+        entry = db.get(QueryLog, query_id)
+        if entry is not None:
+            entry.tokens_used = (entry.tokens_used or 0) + tokens
+            db.commit()
+    except Exception:
+        db.rollback()
+        log.error("query_log_token_update_failed")

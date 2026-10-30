@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-from api.metric_schemas import NAME_PATTERN, MetricOut
+from api.metric_schemas import NAME_PATTERN, MetricOut, metric_out
 
 
 class QueryRequest(BaseModel):
@@ -40,3 +40,16 @@ class QueryResponse(BaseModel):
     row_count: int
     truncated: bool
     warnings: list[str]
+
+
+def query_response(outcome) -> QueryResponse:
+    return QueryResponse(
+        query_id=outcome.query_id,
+        metric=metric_out(outcome.metric),
+        sql=outcome.display_sql,
+        columns=outcome.columns,
+        rows=outcome.rows,
+        row_count=outcome.row_count,
+        truncated=outcome.truncated,
+        warnings=outcome.warnings,
+    )

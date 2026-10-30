@@ -3,8 +3,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from api.metric_schemas import metric_out
-from api.query_schemas import QueryRequest, QueryResponse
+from api.query_schemas import QueryRequest, QueryResponse, query_response
 from core.db import get_db
 from core.ratelimit import rate_limit
 from core.security import Identity, get_identity
@@ -52,13 +51,4 @@ def run_governed_query(
     except ResultInvalid as exc:
         raise HTTPException(status_code=500, detail="The result failed validation.") from exc
 
-    return QueryResponse(
-        query_id=outcome.query_id,
-        metric=metric_out(outcome.metric),
-        sql=outcome.display_sql,
-        columns=outcome.columns,
-        rows=outcome.rows,
-        row_count=outcome.row_count,
-        truncated=outcome.truncated,
-        warnings=outcome.warnings,
-    )
+    return query_response(outcome)
