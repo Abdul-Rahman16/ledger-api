@@ -11,5 +11,20 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  api:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://ledger:ledger@db:5432/ledger
+      - ENVIRONMENT=development
+    env_file:
+      - .env
+    depends_on:
+      - db
+
 volumes:
   pgdata:
