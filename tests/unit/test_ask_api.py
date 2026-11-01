@@ -189,3 +189,32 @@ def test_ask_rate_limit_returns_429(client, dataset, monkeypatch):
 def test_bad_internal_secret_is_rejected(client, dataset):
     headers = {"X-User-Id": "user-1", "X-Internal-Secret": "wrong"}
     assert client.post(url(dataset), json=QUESTION, headers=headers).status_code == 401
+
+def test_explanation_fields_are_returned(client, dataset, monkeypatch):
+    import dataclasses
+
+    outcome = dataclasses.replace(
+        make_answered(), explanation="East leads at 165.5.", explanation_source="template"
+    )
+    monkeypatch.setattr(ask_service, "ask_question", lambda *a, **k: outcome)
+    body = client.post(url(dataset), json=QUESTION).json()
+    assert body["explanation"] == "East leads at 165.5." and body["explanation_source"] == "template"
+
+
+def test_explanation_is_absent_for_clarifications(client, dataset, monkeypatch):
+    monkeypatch.setattr(ask_service, "ask_question", lambda *a, **k: make_clarification())
+    body = client.post(url(dataset), json={"question": "churn rate"}).json()
+    assert body["explanation"] is None and body["explanation_source"] is None
+
+
+def test_explain_flag_defaults_to_true_and_can_be_disabled(client, dataset, monkeypatch):
+    seen = []
+
+    def fake_ask(*args, **kwargs):
+        seen.append(kwargs.get("explain"))
+        return make_clarification()
+
+    monkeypatch.setattr(ask_service, "ask_question", fake_ask)
+    client.post(url(dataset), json=QUESTION)
+    client.post(url(dataset), json=dict(QUESTION, explain=False))
+    assert seen == [True, False]

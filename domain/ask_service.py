@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session
 
 from core.llm import complete_json
 from core.llm_types import LLMUnavailable
+from core.logging import log
 from domain import dataset_service, metric_service, query_service
+from domain.explainer import explain_result
 from domain.models import Dataset
 from domain.query_builder import QueryRejected, QuerySpec
 from domain.query_service import QueryOutcome
@@ -29,6 +31,8 @@ class AskOutcome:
     provider: str | None
     tokens_used: int
     available_metrics: list[str]
+    explanation: str | None = None
+    explanation_source: str | None = None  # "llm" or "template"
 
 
 def ask_question(
@@ -37,6 +41,7 @@ def ask_question(
     user_id: str | None,
     question: str,
     *,
+    explain: bool = True,
     today: date | None = None,
     llm: Callable[[str, str], Any] = complete_json,
 ) -> AskOutcome:
@@ -92,7 +97,29 @@ def ask_question(
     outcome = query_service.run_query(
         db, dataset, user_id, resolution.spec, question=cleaned, tokens_used=resolution.tokens
     )
+
+    explanation = None
+    explanation_source = None
+    total_tokens = resolution.tokens
+    if explain:
+        result = explain_result(
+            question=cleaned,
+            metric=outcome.metric,
+            spec=resolution.spec,
+            columns=columns,
+            rows=outcome.rows,
+            truncated=outcome.truncated,
+            llm=llm,
+        )
+        explanation, explanation_source = result.text, result.source
+        if result.tokens:
+            total_tokens += result.tokens
+            query_service.add_tokens(db, outcome.query_id, result.tokens)
+        if result.fallback_reason:
+            log.info("explanation_fallback", reason=result.fallback_reason)
+
     return AskOutcome(
         "answered", cleaned, None, resolution.spec, outcome,
-        resolution.provider, resolution.tokens, names,
+        resolution.provider, total_tokens, names,
+        explanation=explanation, explanation_source=explanation_source,
     )

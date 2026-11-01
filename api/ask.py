@@ -31,7 +31,7 @@ def ask(
         raise HTTPException(status_code=404, detail="Dataset not found.")
 
     try:
-        outcome = ask_service.ask_question(db, dataset, identity.user_id, body.question)
+        outcome = ask_service.ask_question(db, dataset, identity.user_id, body.question, explain=body.explain)
     except QueryRejected as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except LLMUnavailable as exc:

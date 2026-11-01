@@ -223,3 +223,23 @@ def test_resolve_question_returns_a_clarification_for_garbage():
     resolution = resolve_question("blah blah", ctx(), llm)
     assert resolution.spec is None and resolution.clarification
     assert resolution.provider == "gemini" and resolution.tokens == 10
+
+def test_unsupported_request_becomes_a_clarification_even_with_a_valid_metric():
+    message = clarify(reply(metric="total_revenue", unsupported_request="breakdown by customer email"))
+    assert "customer email" in message
+    assert "Available columns" in message and "total_revenue" in message
+
+
+def test_unsupported_request_is_cleaned_and_length_limited():
+    message = clarify(reply(metric="total_revenue", unsupported_request="line1\nline2\x00" + "x" * 1000))
+    assert "\n" not in message and "\x00" not in message and "xxxxxxxx" in message
+
+
+def test_blank_or_non_text_unsupported_request_is_ignored():
+    for value in (None, "", "   ", 5, [], {"a": 1}, True):
+        assert ok(reply(metric="total_revenue", unsupported_request=value)).metric == "total_revenue"
+
+
+def test_system_prompt_tells_the_model_not_to_drop_parts_of_a_request():
+    system, _ = build_prompts("revenue", ctx())
+    assert "unsupported_request" in system and "silently drop" in system

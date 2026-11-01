@@ -9,6 +9,7 @@ from domain.ask_service import AskOutcome
 
 class AskRequest(BaseModel):
     question: str = Field(min_length=3, max_length=500)
+    explain: bool = True  # set false to skip the explanation (saves one LLM call)
 
 
 class InterpretationOut(BaseModel):
@@ -31,6 +32,8 @@ class AskResponse(BaseModel):
     available_metrics: list[str] = []
     interpretation: InterpretationOut | None = None
     result: QueryResponse | None = None
+    explanation: str | None = None  # plain text: render it as text, never as HTML
+    explanation_source: Literal["llm", "template"] | None = None
     provider: str | None = None
     tokens_used: int = 0
 
@@ -56,6 +59,8 @@ def ask_response(outcome: AskOutcome) -> AskResponse:
         available_metrics=outcome.available_metrics,
         interpretation=interpretation,
         result=query_response(outcome.query) if outcome.query is not None else None,
+        explanation=outcome.explanation,
+        explanation_source=outcome.explanation_source,
         provider=outcome.provider,
         tokens_used=outcome.tokens_used,
     )

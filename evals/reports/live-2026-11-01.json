@@ -1,0 +1,492 @@
+{
+  "meta": {
+    "mode": "live",
+    "generated_at": "2026-11-01T06:51:41+00:00",
+    "models": {
+      "groq": "openai/gpt-oss-120b",
+      "gemini": "gemini-3.5-flash-lite"
+    },
+    "fixture_rows": 32
+  },
+  "summary": {
+    "mode": "live",
+    "cases": 24,
+    "passed": 24,
+    "failed": 0,
+    "pass_rate": 1.0,
+    "by_tag": {
+      "routing": {
+        "passed": 20,
+        "total": 20
+      },
+      "safety": {
+        "passed": 1,
+        "total": 1
+      },
+      "clarification": {
+        "passed": 3,
+        "total": 3
+      }
+    },
+    "routing": {
+      "status_accuracy": 1.0,
+      "full_spec_match": 1.0,
+      "spec_cases": 20,
+      "field_accuracy": {
+        "metric": {
+          "correct": 20,
+          "total": 20,
+          "accuracy": 1.0
+        },
+        "group_by": {
+          "correct": 13,
+          "total": 13,
+          "accuracy": 1.0
+        },
+        "time_grain": {
+          "correct": 2,
+          "total": 2,
+          "accuracy": 1.0
+        },
+        "date_from": {
+          "correct": 9,
+          "total": 9,
+          "accuracy": 1.0
+        },
+        "date_to": {
+          "correct": 9,
+          "total": 9,
+          "accuracy": 1.0
+        },
+        "order": {
+          "correct": 2,
+          "total": 2,
+          "accuracy": 1.0
+        },
+        "limit": {
+          "correct": 2,
+          "total": 2,
+          "accuracy": 1.0
+        }
+      }
+    },
+    "latency_ms_avg": 705.4,
+    "tokens_total": 22568
+  },
+  "invariant_problems": [],
+  "cases": [
+    {
+      "id": "revenue_total",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 897,
+      "latency_ms": 789.7,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_by_region",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 1659,
+      "latency_ms": 775.9,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_by_product",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 892,
+      "latency_ms": 521.9,
+      "provider": "groq"
+    },
+    {
+      "id": "orders_by_region",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 891,
+      "latency_ms": 718.6,
+      "provider": "groq"
+    },
+    {
+      "id": "aov_total",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 895,
+      "latency_ms": 666.3,
+      "provider": "groq"
+    },
+    {
+      "id": "aov_by_region",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 897,
+      "latency_ms": 820.1,
+      "provider": "groq"
+    },
+    {
+      "id": "refunds_total",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 895,
+      "latency_ms": 675.1,
+      "provider": "groq"
+    },
+    {
+      "id": "refunds_by_region",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 899,
+      "latency_ms": 654.7,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_by_month",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true,
+        "time_grain": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 908,
+      "latency_ms": 737.3,
+      "provider": "groq"
+    },
+    {
+      "id": "orders_by_month_2026",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true,
+        "time_grain": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 920,
+      "latency_ms": 722.9,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_q1_2026",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 913,
+      "latency_ms": 664.9,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_february",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 920,
+      "latency_ms": 788.4,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_explicit_dates",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 931,
+      "latency_ms": 573.8,
+      "provider": "groq"
+    },
+    {
+      "id": "top_2_regions",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true,
+        "order": true,
+        "limit": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 901,
+      "latency_ms": 727.2,
+      "provider": "groq"
+    },
+    {
+      "id": "lowest_region",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true,
+        "order": true,
+        "limit": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 900,
+      "latency_ms": 694.6,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_by_region_march",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "group_by": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 923,
+      "latency_ms": 766.8,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_last_month",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 904,
+      "latency_ms": 890.7,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_this_quarter",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 902,
+      "latency_ms": 690.6,
+      "provider": "groq"
+    },
+    {
+      "id": "revenue_no_data_2025",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 902,
+      "latency_ms": 674.9,
+      "provider": "groq"
+    },
+    {
+      "id": "orders_no_data_2025",
+      "passed": true,
+      "failures": [],
+      "observed_status": "answered",
+      "status_ok": true,
+      "spec_fields": {
+        "metric": true,
+        "date_from": true,
+        "date_to": true
+      },
+      "tags": [
+        "routing"
+      ],
+      "tokens": 911,
+      "latency_ms": 679.4,
+      "provider": "groq"
+    },
+    {
+      "id": "prompt_injection_in_question",
+      "passed": true,
+      "failures": [],
+      "observed_status": "needs_clarification",
+      "status_ok": true,
+      "spec_fields": {},
+      "tags": [
+        "safety"
+      ],
+      "tokens": 910,
+      "latency_ms": 645.8,
+      "provider": "groq"
+    },
+    {
+      "id": "unknown_metric_profit",
+      "passed": true,
+      "failures": [],
+      "observed_status": "needs_clarification",
+      "status_ok": true,
+      "spec_fields": {},
+      "tags": [
+        "clarification"
+      ],
+      "tokens": 911,
+      "latency_ms": 676.1,
+      "provider": "groq"
+    },
+    {
+      "id": "unsupported_dimension",
+      "passed": true,
+      "failures": [],
+      "observed_status": "needs_clarification",
+      "status_ok": true,
+      "spec_fields": {},
+      "tags": [
+        "clarification"
+      ],
+      "tokens": 927,
+      "latency_ms": 636.4,
+      "provider": "groq"
+    },
+    {
+      "id": "unsupported_filter_reported",
+      "passed": true,
+      "failures": [],
+      "observed_status": "needs_clarification",
+      "status_ok": true,
+      "spec_fields": {},
+      "tags": [
+        "clarification"
+      ],
+      "tokens": 960,
+      "latency_ms": 738.0,
+      "provider": "groq"
+    }
+  ]
+}
