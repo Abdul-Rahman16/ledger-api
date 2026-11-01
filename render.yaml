@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: ledger-api
+    runtime: docker
+    plan: free
+    region: singapore          # pick the region closest to your Neon project
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: RUN_MIGRATIONS
+        value: "1"
+      - key: DATABASE_URL
+        sync: false
+      - key: INTERNAL_SECRET
+        generateValue: true
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite

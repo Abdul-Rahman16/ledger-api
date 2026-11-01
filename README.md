@@ -155,49 +155,61 @@ The database container will run on port `5434` (mapped to internal `5432`).
 
 ---
 
+### 5. Start the Environment (Recommended: Docker Compose)
+
+The easiest and most reliable way to run the database and API (bypassing Windows WDAC / Application Control DLL policies) is Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+- **API Base URL**: `http://localhost:8000` (live reloading on file edits enabled)
+- **Interactive Swagger Docs**: `http://localhost:8000/docs`
+- **PostgreSQL Database**: Port `5434` (mapped to internal `5432`)
+
+To view live API server logs:
+```bash
+docker compose logs -f api
+```
+
+To run all unit tests in the container:
+```bash
+docker compose exec api pytest
+```
+
+---
+
 ### 6. Run Database Migrations
 
 Apply Alembic migrations to create the database tables:
 
+```bash
+docker compose exec api python -m alembic upgrade head
+```
+
+Or locally if connecting from host:
 ```bash
 python -m alembic upgrade head
 ```
 
 To autogenerate a new migration after editing `domain/models.py`:
 ```bash
-python -m alembic revision --autogenerate -m "describe changes"
-python -m alembic upgrade head
+docker compose exec api python -m alembic revision --autogenerate -m "describe changes"
+docker compose exec api python -m alembic upgrade head
 ```
-
-> **Windows / Device Guard Tip**: Use `python -m alembic ...` instead of `alembic ...` to bypass Device Guard / WDAC execution policies that block unsigned binary stubs in `.venv\Scripts`.
-
----
-
-### 7. Run the API Server
-
-Start the local development server with auto-reload:
-
-```bash
-python -m uvicorn main:app --reload --port 8000
-```
-
-- **API Base URL**: `http://localhost:8000`
-- **Interactive Swagger Docs**: `http://localhost:8000/docs`
-- **ReDoc API Documentation**: `http://localhost:8000/redoc`
 
 ---
 
 ## Running Tests
 
-Run the full unit test suite with `pytest`:
-
+Run the full unit test suite inside the container:
 ```bash
-python -m pytest
+docker compose exec api pytest
 ```
 
-Run tests with verbose output:
+Or locally (pure-Python tests):
 ```bash
-python -m pytest -v
+python -m pytest tests/unit/test_metric_validator.py tests/unit/test_periods.py tests/unit/test_query_builder.py
 ```
 
 ---

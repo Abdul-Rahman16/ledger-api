@@ -14,6 +14,10 @@ services:
   api:
     build: .
     restart: always
+    # Development only: run as root so the bind-mounted project stays writable, and reload on changes.
+    # The image itself runs as an unprivileged user (see Dockerfile).
+    user: root
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
     volumes:
