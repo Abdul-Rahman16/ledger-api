@@ -46,5 +46,7 @@ jobs:
         run: alembic check
       - name: Unit tests
         run: python -m pytest tests/unit -q
+      - name: Integration tests (real Postgres, fake object store)
+        run: python -m pytest tests/integration -q
       - name: Golden-question evals (offline, real Postgres)
         run: python -m pytest tests/eval -q

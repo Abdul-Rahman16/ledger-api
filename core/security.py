@@ -38,3 +38,14 @@ def get_identity(
             detail="Invalid or missing internal credentials.",
         )
     return Identity(user_id=user_id[:200])
+
+
+def require_internal_secret(x_internal_secret: str | None = Header(default=None)) -> None:
+    """For /internal/* routes: only callers holding the shared secret. Fails closed if none is configured."""
+    expected = settings.internal_secret
+    provided = x_internal_secret or ""
+    if not expected or not hmac.compare_digest(provided.encode(), expected.encode()):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing internal credentials.",
+        )

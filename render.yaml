@@ -24,3 +24,15 @@ services:
         value: openai/gpt-oss-120b
       - key: GEMINI_MODEL
         value: gemini-3.5-flash-lite
+      - key: STORAGE_BUCKET
+        sync: false
+      - key: STORAGE_ENDPOINT_URL
+        sync: false
+      - key: STORAGE_REGION
+        sync: false
+      - key: STORAGE_ACCESS_KEY_ID
+        sync: false
+      - key: STORAGE_SECRET_ACCESS_KEY
+        sync: false
+      - key: GUEST_RETENTION_HOURS
+        value: "24"

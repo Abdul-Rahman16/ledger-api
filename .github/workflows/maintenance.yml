@@ -1,0 +1,23 @@
+name: Maintenance
+
+on:
+  schedule:
+    - cron: "17 3 * * *"  # daily at 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  purge-guest-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete expired guest datasets
+        env:
+          API_URL: ${{ secrets.LEDGER_API_URL }}
+          INTERNAL_SECRET: ${{ secrets.LEDGER_INTERNAL_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --max-time 120 --retry 3 --retry-delay 20 --retry-all-errors \
+            -X POST -H "X-Internal-Secret: ${INTERNAL_SECRET}" \
+            "${API_URL}/internal/maintenance/purge-guest-data"

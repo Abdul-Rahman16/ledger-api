@@ -9,6 +9,14 @@ from core.logging import log
 from domain.models import Dataset, DatasetColumn
 from domain.profiling import clean_dataframe, profile_dataframe, quality_score
 
+from core.storage import Storage, get_storage, raw_object_key
+
+_CONTENT_TYPES = {
+    "csv": "text/csv",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "json": "application/json",
+}
+
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_ROWS = 100_000
 MAX_COLUMNS = 100
@@ -46,8 +54,38 @@ def read_upload(filename: str, content: bytes) -> tuple[pd.DataFrame, str]:
         raise IngestionError(f"File has {len(df.columns)} columns; the limit is {MAX_COLUMNS}.")
     return df, source_type
 
+def _store_raw_copy(
+    db: Session,
+    dataset: Dataset,
+    filename: str,
+    content: bytes,
+    user_id: str | None,
+    storage: Storage | None,
+) -> None:
+    """Keep the original upload so the dataset can be rebuilt later.
 
-def ingest_dataset(db: Session, filename: str, content: bytes, user_id: str | None = None) -> Dataset:
+    Best effort: the data is already loaded, so an object-store outage must not fail the upload.
+    """
+    if storage is None:
+        return
+    dataset_id = dataset.id
+    key = raw_object_key(dataset_id, filename, user_id)
+    extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    try:
+        storage.put(key, content, _CONTENT_TYPES.get(extension))
+        dataset.storage_key = key
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        log.error("raw_upload_store_failed", dataset_id=str(dataset_id), error=type(exc).__name__)
+
+def ingest_dataset(
+    db: Session,
+    filename: str,
+    content: bytes,
+    user_id: str | None = None,
+    storage: Storage | None = None,
+) -> Dataset:
     raw_df, source_type = read_upload(filename, content)
     clean_df, report = clean_dataframe(raw_df)
     if clean_df.empty or len(clean_df.columns) == 0:
@@ -86,6 +124,8 @@ def ingest_dataset(db: Session, filename: str, content: bytes, user_id: str | No
         db.commit()
         log.error("dataset_ingestion_failed", dataset_id=str(dataset_id))
         raise
+
+    _store_raw_copy(db, dataset, filename, content, user_id, storage if storage is not None else get_storage())
 
     log.info("dataset_ingested", dataset_id=str(dataset_id), rows=len(clean_df), quality_score=score)
     db.refresh(dataset)

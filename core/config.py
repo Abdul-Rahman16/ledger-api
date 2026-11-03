@@ -16,9 +16,19 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = 20.0
     llm_max_output_tokens: int = 2048  # reasoning models spend part of this on thinking
 
-    # Shared secret between the Next.js server and this API.
+    # Shared secret between the Next.js server and this API (also guards /internal/*).
     # Empty means "no authenticated users accepted" (fail closed).
     internal_secret: str = ""
+
+    # Object storage for raw uploads (any S3-compatible store). Leave STORAGE_BUCKET empty to disable.
+    storage_bucket: str = ""
+    storage_endpoint_url: str = ""  # R2: https://<account id>.r2.cloudflarestorage.com ; empty for AWS S3
+    storage_region: str = ""  # R2: auto ; AWS: for example ap-south-1
+    storage_access_key_id: str = ""
+    storage_secret_access_key: str = ""
+
+    # Guest datasets are deleted after this many hours by the maintenance job.
+    guest_retention_hours: int = 24
 
     upload_rate_limit_per_minute: int = 10
     read_rate_limit_per_minute: int = 60
