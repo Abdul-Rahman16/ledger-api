@@ -4,6 +4,7 @@ from api.ask import router as ask_router
 from api.datasets import router as datasets_router
 from api.maintenance import router as maintenance_router
 from api.metrics import router as metrics_router
+from api.pipeline import router as pipeline_router
 from api.query import router as query_router
 
 app = FastAPI(title="Ledger API", version="0.1.0")
@@ -18,4 +19,5 @@ app.include_router(datasets_router)
 app.include_router(metrics_router)
 app.include_router(query_router)
 app.include_router(ask_router)
+app.include_router(pipeline_router)
 app.include_router(maintenance_router)

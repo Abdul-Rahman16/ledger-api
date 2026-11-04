@@ -106,3 +106,42 @@ class QueryLog(Base):
         Index("ix_query_logs_dataset_id", "dataset_id"),
         Index("ix_query_logs_user_id", "user_id"),
     )
+
+
+class QualitySnapshot(Base):
+    """One re-profile of a dataset: how big and how clean it was at that moment."""
+
+    __tablename__ = "quality_snapshots"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    dataset_id = Column(UUID(as_uuid=True), ForeignKey("datasets.id"), nullable=False)
+    taken_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    row_count = Column(Integer, nullable=False)
+    column_count = Column(Integer, nullable=False)
+    quality_score = Column(Float, nullable=False)
+    quality_delta = Column(Float, nullable=True)  # change vs the previous snapshot; NULL for the first
+    row_delta = Column(Integer, nullable=True)
+    fingerprint = Column(String, nullable=False)  # hash of row count + column profile
+    changed = Column(Boolean, nullable=True)  # NULL for the first snapshot (the baseline)
+
+    __table_args__ = (Index("ix_quality_snapshots_dataset_time", "dataset_id", "taken_at"),)
+
+
+class MetricSnapshot(Base):
+    """The headline value of a governed metric at a point in time."""
+
+    __tablename__ = "metric_snapshots"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    dataset_id = Column(UUID(as_uuid=True), ForeignKey("datasets.id"), nullable=False)
+    metric_id = Column(UUID(as_uuid=True), ForeignKey("metric_definitions.id"), nullable=False)
+    metric_version = Column(Integer, nullable=False)
+    taken_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    value = Column(Float, nullable=True)
+    status = Column(String, nullable=False)  # ok, empty (no matching rows) or failed
+    row_count = Column(Integer, nullable=True)  # rows in the dataset when computed
+
+    __table_args__ = (
+        Index("ix_metric_snapshots_metric_time", "metric_id", "taken_at"),
+        Index("ix_metric_snapshots_dataset_id", "dataset_id"),
+    )

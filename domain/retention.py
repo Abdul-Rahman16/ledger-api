@@ -7,7 +7,14 @@ from sqlalchemy.orm import Session
 
 from core.logging import log
 from core.storage import Storage
-from domain.models import Dataset, DatasetColumn, MetricDefinition, QueryLog
+from domain.models import (
+    Dataset,
+    DatasetColumn,
+    MetricDefinition,
+    MetricSnapshot,
+    QualitySnapshot,
+    QueryLog,
+)
 from domain.query_builder import TABLE_RE
 
 
@@ -35,6 +42,8 @@ def delete_dataset(db: Session, dataset: Dataset, storage: Storage | None) -> bo
         storage.delete(storage_key)
         object_deleted = True
 
+    db.execute(delete(MetricSnapshot).where(MetricSnapshot.dataset_id == dataset_id))
+    db.execute(delete(QualitySnapshot).where(QualitySnapshot.dataset_id == dataset_id))
     db.execute(delete(QueryLog).where(QueryLog.dataset_id == dataset_id))
     db.execute(delete(MetricDefinition).where(MetricDefinition.dataset_id == dataset_id))
     db.execute(delete(DatasetColumn).where(DatasetColumn.dataset_id == dataset_id))

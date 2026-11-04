@@ -37,4 +37,9 @@ class Settings(BaseSettings):
     ask_rate_limit_per_minute: int = 10  # each call can use an LLM request
 
 
+        # Pipeline freshness (used by the scheduled maintenance jobs)
+    profile_stale_after_hours: int = 24
+    metric_refresh_after_hours: int = 24
+
+
 settings = Settings()

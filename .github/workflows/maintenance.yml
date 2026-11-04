@@ -9,15 +9,32 @@ permissions:
   contents: read
 
 jobs:
-  purge-guest-data:
+  nightly:
     runs-on: ubuntu-latest
+    env:
+      API_URL: ${{ secrets.LEDGER_API_URL }}
+      INTERNAL_SECRET: ${{ secrets.LEDGER_INTERNAL_SECRET }}
     steps:
+      - name: Sanitize API_URL
+        run: echo "API_URL=${API_URL%/}" >> "$GITHUB_ENV"
+
       - name: Delete expired guest datasets
-        env:
-          API_URL: ${{ secrets.LEDGER_API_URL }}
-          INTERNAL_SECRET: ${{ secrets.LEDGER_INTERNAL_SECRET }}
         run: |
           curl --fail-with-body --silent --show-error \
             --max-time 120 --retry 3 --retry-delay 20 --retry-all-errors \
             -X POST -H "X-Internal-Secret: ${INTERNAL_SECRET}" \
             "${API_URL}/internal/maintenance/purge-guest-data"
+
+      - name: Re-profile datasets and record quality deltas
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --max-time 120 --retry 3 --retry-delay 20 --retry-all-errors \
+            -X POST -H "X-Internal-Secret: ${INTERNAL_SECRET}" \
+            "${API_URL}/internal/maintenance/reprofile"
+
+      - name: Snapshot governed metrics
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --max-time 120 --retry 3 --retry-delay 20 --retry-all-errors \
+            -X POST -H "X-Internal-Secret: ${INTERNAL_SECRET}" \
+            "${API_URL}/internal/maintenance/snapshot-metrics"

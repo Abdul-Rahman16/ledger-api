@@ -15,7 +15,7 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: INTERNAL_SECRET
-        generateValue: true
+        sync: false
       - key: GROQ_API_KEY
         sync: false
       - key: GEMINI_API_KEY

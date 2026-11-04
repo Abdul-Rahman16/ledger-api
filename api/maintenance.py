@@ -8,7 +8,7 @@ from core.config import settings
 from core.db import get_db
 from core.security import require_internal_secret
 from core.storage import get_storage
-from domain import retention
+from domain import retention, snapshots
 
 # Not part of the public API: hidden from the docs and guarded by the internal secret.
 router = APIRouter(
@@ -28,6 +28,22 @@ class PurgeOut(BaseModel):
     errors: int
 
 
+class ReprofileOut(BaseModel):
+    stale_after_hours: int
+    candidates: int
+    profiled: int
+    changed: int
+    failed: int
+
+
+class SnapshotMetricsOut(BaseModel):
+    refresh_after_hours: int
+    datasets: int
+    computed: int
+    skipped: int
+    failed: int
+
+
 @router.post("/purge-guest-data", response_model=PurgeOut)
 def purge_guest_data(
     older_than_hours: int | None = Query(default=None, ge=1, le=720),
@@ -45,4 +61,38 @@ def purge_guest_data(
         datasets_deleted=report.datasets_deleted,
         objects_deleted=report.objects_deleted,
         errors=report.errors,
+    )
+
+
+@router.post("/reprofile", response_model=ReprofileOut)
+def reprofile(
+    stale_after_hours: int | None = Query(default=None, ge=1, le=720),
+    limit: int = Query(default=20, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    hours = stale_after_hours or settings.profile_stale_after_hours
+    report = snapshots.reprofile_stale_datasets(db, stale_after=timedelta(hours=hours), limit=limit)
+    return ReprofileOut(
+        stale_after_hours=hours,
+        candidates=report.candidates,
+        profiled=report.profiled,
+        changed=report.changed,
+        failed=report.failed,
+    )
+
+
+@router.post("/snapshot-metrics", response_model=SnapshotMetricsOut)
+def snapshot_metrics(
+    refresh_after_hours: int | None = Query(default=None, ge=1, le=720),
+    limit: int = Query(default=50, ge=1, le=200),
+    db: Session = Depends(get_db),
+):
+    hours = refresh_after_hours or settings.metric_refresh_after_hours
+    report = snapshots.snapshot_stale_metrics(db, refresh_after=timedelta(hours=hours), limit=limit)
+    return SnapshotMetricsOut(
+        refresh_after_hours=hours,
+        datasets=report.datasets,
+        computed=report.computed,
+        skipped=report.skipped,
+        failed=report.failed,
     )
