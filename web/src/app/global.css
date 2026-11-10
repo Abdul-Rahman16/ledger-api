@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: var(--font-jb-mono), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --color-canvas: #f6f7fb;
+}
+
+:root {
+    color-scheme: light;
+}
+
+body {
+    background-color: var(--color-canvas);
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Indeterminate progress bar shown while the server profiles an upload. */
+@keyframes indeterminate {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(300%);
+    }
+}
+
+.indeterminate-bar {
+    animation: indeterminate 1.3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .indeterminate-bar {
+        animation: none;
+        width: 100%;
+        opacity: 0.6;
+    }
+}

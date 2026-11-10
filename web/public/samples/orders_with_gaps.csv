@@ -1,0 +1,13 @@
+order_id,region,channel,amount,discount_code,order_date,country
+1,North,Web,120.50,SPRING10,2026-02-01,India
+2,South,Store,89.99,,2026-02-02,India
+3,East,Web,230.25,,2026-02-03,India
+4,,Store,60.00,,2026-02-04,India
+5,West,Web,,,2026-02-05,India
+6,North,Store,45.00,,2026-02-06,India
+7,South,Web,310.00,SPRING10,2026-02-07,India
+8,East,Store,75.25,,2026-02-08,India
+9,West,Web,99.99,,2026-02-09,India
+10,North,Store,150.00,,2026-02-10,India
+11,South,Web,210.40,WELCOME5,2026-02-11,India
+12,East,Store,42.10,,2026-02-12,India
